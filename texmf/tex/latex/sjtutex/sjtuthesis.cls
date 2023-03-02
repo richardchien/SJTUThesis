@@ -235,6 +235,7 @@
     { amsmath, thmmarks } { ntheorem     } ,
     { chapter           } { algorithm    } ,
     { algochapter       } { algorithm2e  } ,
+    { chapter, newfloat } { minted       } ,
     {
       \bool_if:NTF \g__sjtu_integral_limits_bool
         { displaylimits } { nolimits }
@@ -1626,6 +1627,44 @@
         texcl             = true ,
         mathescape        = true
       }
+  }
+\ctex_at_end_package:nn { minted }
+  {
+    % Define names
+    \keys_define:nn { sjtu / name }
+      {
+        listing   .tl_set:N = \l__sjtu_name_listing_tl ,
+        listing  .initial:n = { Listing } ,
+        listing*  .tl_set:N = \l__sjtu_name_listing_aux_tl ,
+        listing* .initial:n = { 代码清单 } ,
+      }
+    % Set caption name
+    \captionsetup [ listing ] { name = \l__sjtu_name_listing_aux_tl }
+    \captionsetup [ listing ] [ bi-first  ] { name = \l__sjtu_name_listing_aux_tl }
+    \captionsetup [ listing ] [ bi-second ] { name = \l__sjtu_name_listing_tl     }
+    % Set numbering style
+    \AtBeginDocument
+      {
+        \cs_set:Npn \thelisting
+          { \thechapter \l__sjtu_style_fl_num_sep_tl \arabic { listing } }
+      }
+    % Set display style
+    \setminted
+      {
+        frame           = lines ,
+        framerule       = 1pt ,
+        framesep        = 3mm ,
+        autogobble ,
+        baselinestretch = 1 ,
+        breaklines ,
+        stripnl ,
+        tabsize         = 4
+      }
+    % Remove redundant vertical space around listings
+    \let \oldminted    \minted
+    \let \oldendminted \endminted
+    \def \minted    { \vspace { -0.4cm } \oldminted }
+    \def \endminted { \oldendminted \vspace { -0.4cm } }
   }
 \ctex_at_end_package:nn { nomencl }
   { \tl_set:Nn \nomname { \SJTU@nomname } }
