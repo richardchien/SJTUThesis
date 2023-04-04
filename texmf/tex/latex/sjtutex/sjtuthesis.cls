@@ -5,25 +5,25 @@
 %% The original source files were:
 %%
 %% sjtutex.dtx  (with options: `class,thesis')
-%% 
+%%
 %%     Copyright (C) SJTUG
 %%       2018--2023 Alexara Wu   <alexarawu@outlook.com>
 %%       2022--2023 Log Creative <logcreative@outlook.com>
-%% 
+%%
 %%     This work may be distributed and/or modified under the
 %%     conditions of the LaTeX Project Public License, either
 %%     version 1.3c of this license or (at your option) any later
 %%     version. The latest version of this license is in:
-%% 
+%%
 %%       http://www.latex-project.org/lppl.txt
-%% 
+%%
 %%     and version 1.3 or later is part of all distributions of
 %%     LaTeX version 2005/12/01 or later.
-%% 
+%%
 %%     This work has the LPPL maintenance status `maintained'.
-%% 
+%%
 %%     The Current Maintainers of this work are Alexara Wu and Log Creative.
-%% 
+%%
 \NeedsTeXFormat{LaTeX2e}
 \RequirePackage{expl3}
 \GetIdInfo $Id: sjtutex.dtx 2.0.2 2023-04-01 13:00:00Z Alexara Wu <alexarawu@outlook.com> $
@@ -574,6 +574,10 @@
     figure*       .initial:n = { 图 } ,
     table*         .tl_set:N = \SJTU@tablename@aux ,
     table*        .initial:n = { 表 } ,
+    listing        .tl_set:N = \SJTU@listingname ,
+    listing       .initial:n = { Listing } ,
+    listing*       .tl_set:N = \SJTU@listingname@aux ,
+    listing*      .initial:n = { 代码清单 } ,
     algorithm      .tl_set:N = \SJTU@algorithmname ,
     algorithm     .initial:n = { Algorithm } ,
     listalgorithm  .tl_set:N = \SJTU@listalgorithmname ,
@@ -1628,27 +1632,17 @@
         mathescape        = true
       }
   }
+\ctex_at_end_package:nn { nomencl }
+  { \tl_set:Nn \nomname { \SJTU@nomname } }
 \ctex_at_end_package:nn { minted }
   {
-    % Define names
-    \keys_define:nn { sjtu / name }
-      {
-        listing   .tl_set:N = \l__sjtu_name_listing_tl ,
-        listing  .initial:n = { Listing } ,
-        listing*  .tl_set:N = \l__sjtu_name_listing_aux_tl ,
-        listing* .initial:n = { 代码清单 } ,
-      }
-    % Set caption name
-    \captionsetup [ listing ] { name = \l__sjtu_name_listing_aux_tl }
-    \captionsetup [ listing ] [ bi-first  ] { name = \l__sjtu_name_listing_aux_tl }
-    \captionsetup [ listing ] [ bi-second ] { name = \l__sjtu_name_listing_tl     }
-    % Set numbering style
-    \AtBeginDocument
-      {
-        \cs_set:Npn \thelisting
-          { \thechapter \l__sjtu_style_fl_num_sep_tl \arabic { listing } }
-      }
-    % Set display style
+    \captionsetup [ listing ] { name = \SJTU@listingname }
+    \captionsetup [ listing ] [ bi-first  ] { name = \SJTU@listingname     }
+    \captionsetup [ listing ] [ bi-second ] { name = \SJTU@listingname@aux }
+
+    \cs_set:Npn \thelisting
+      { \thechapter \l__sjtu_style_fl_num_sep_tl \arabic { listing } }
+
     \setminted
       {
         frame           = lines ,
@@ -1660,14 +1654,10 @@
         stripnl ,
         tabsize         = 4
       }
-    % Remove redundant vertical space around listings
-    \let \oldminted    \minted
-    \let \oldendminted \endminted
-    \def \minted    { \vspace { -0.4cm } \oldminted }
-    \def \endminted { \oldendminted \vspace { -0.4cm } }
+
+    \__sjtu_preto_cmd:Nn \minted    { \vspace { -0.4cm } }
+    \__sjtu_appto_cmd:Nn \endminted { \vspace { -0.4cm } }
   }
-\ctex_at_end_package:nn { nomencl }
-  { \tl_set:Nn \nomname { \SJTU@nomname } }
 \endinput
 %%
 %% End of file `sjtuthesis.cls'.
